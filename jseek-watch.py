@@ -53,8 +53,8 @@ def send_ntfy(title, message, click=None):
     if not topic:
         return False
     url = topic if topic.startswith("http") else f"https://ntfy.sh/{topic}"
-    body = json.dumps({"topic": url.split("/")[-1], "title": title, "message": message}).encode()
-    req = urllib.request.Request(url, data=body, method="POST")
+    req = urllib.request.Request(url, data=message.encode(), method="POST")
+    req.add_header("Title", title)
     if click:
         req.add_header("Click", click)
     urllib.request.urlopen(req, timeout=15)
