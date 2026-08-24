@@ -1,22 +1,39 @@
 # jseek-watch
 
-Polls a public [jseek.co](https://jseek.co) watchlist every 5 minutes via GitHub Actions and sends a push notification when new job postings appear.
+Gets a push notification on your phone whenever a **new job** appears on a [jseek.co](https://jseek.co) watchlist. Runs for free on GitHub Actions every 5 minutes.
 
-## Setup
+## Setup (5 minutes)
 
-1. Pick a private topic name for [ntfy.sh](https://ntfy.sh) (e.g. `jseek-alerts-<random>`).
-2. Add it as a repo secret: **Settings → Secrets and variables → Actions → New repository secret**, name `NTFY_TOPIC`.
-3. Install the [ntfy app](https://ntfy.sh) on your phone (or open `https://ntfy.sh/<topic>` in a browser) and subscribe to the topic.
-4. Test: **Actions → watch-jseek → Run workflow**, then send a test push: `curl -d "test" https://ntfy.sh/<topic>`.
+**1. Fork or copy this repo to your own GitHub account.**
 
-Optional email alerts: add secrets `ALERT_TO`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (see header of `jseek-watch.py`).
+**2. Pick a topic name** — any random string, e.g. `my-jobs-9x7k2q`. This is your private notification channel.
 
-## Watch any watchlist
+**3. Add the topic as a secret** (so only your repo knows it):
+- Go to your repo → **Settings** → **Secrets and variables** → **Actions**
+- Click **New repository secret**
+- Name: `NTFY_TOPIC`
+- Value: your topic name
+- Save
 
-Set a repo variable (Settings → Secrets and variables → Actions → **Variables**) `WATCHLIST_URL` to any public jseek watchlist URL, e.g.:
+**4. Subscribe on your phone**:
+- Install the **ntfy** app (Play Store / App Store)
+- Open it, tap **+**, type your topic name, tap **Subscribe**
+- Allow notifications
 
-```
-https://jseek.co/en/colophongroup/maang
-```
+**5. Test it**:
+- In your repo: **Actions** → **watch-jseek** → **Run workflow**
+- Tick **"Send a test notification"** and run
+- You should get a push within seconds. Done!
 
-A separate state file is auto-derived per URL, so you can switch watchlists anytime (or run the script locally for multiple lists). Leave the variable unset to keep watching the default list.
+## Want to watch a different watchlist?
+
+Go to **Settings → Secrets and variables → Actions → Variables** and add:
+
+- Name: `WATCHLIST_URL`
+- Value: any public watchlist URL, e.g. `https://jseek.co/en/colophongroup/maang`
+
+Leave it empty to keep the default watchlist.
+
+## Optional: also get an email copy
+
+Add these secrets (same place as step 3): `ALERT_TO`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`.
