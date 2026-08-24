@@ -1,6 +1,6 @@
 # jseek-watch
 
-Polls a public [jseek.co](https://jseek.co) watchlist every 30 minutes via GitHub Actions and sends a push notification when new job postings appear.
+Polls a public [jseek.co](https://jseek.co) watchlist every 5 minutes via GitHub Actions and sends a push notification when new job postings appear.
 
 ## Setup
 
