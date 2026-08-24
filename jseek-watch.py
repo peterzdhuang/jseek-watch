@@ -5,6 +5,12 @@ Usage:
     python3 jseek-watch.py            # one poll; prints new jobs, updates state
     NTFY_TOPIC=mytopic python3 ...    # also push alerts to https://ntfy.sh/<topic>
 
+Watch any public jseek.co watchlist (env vars):
+    WATCHLIST_URL=https://jseek.co/en/owner/slug python3 jseek-watch.py
+    STATE_FILE=my-state.json python3 jseek-watch.py   # optional custom state file
+    A separate state file is auto-derived per watchlist URL, so multiple
+    watchlists can run side by side without clobbering each other.
+
 Email alerts (optional, via env vars):
     ALERT_TO=you@example.com SMTP_HOST=smtp.example.com SMTP_PORT=587 \
     SMTP_USER=you@example.com SMTP_PASS=secret python3 jseek-watch.py
@@ -25,8 +31,17 @@ import sys
 import urllib.request
 from email.message import EmailMessage
 
-WATCHLIST_URL = "https://jseek.co/en/ph1425015107/new-watchlist"
-STATE_FILE = pathlib.Path(__file__).with_name(".jseek-watchlist-state.json")
+DEFAULT_WATCHLIST_URL = "https://jseek.co/en/ph1425015107/new-watchlist"
+WATCHLIST_URL = os.environ.get("WATCHLIST_URL") or DEFAULT_WATCHLIST_URL
+
+if os.environ.get("STATE_FILE"):
+    state_name = os.environ["STATE_FILE"]
+elif WATCHLIST_URL == DEFAULT_WATCHLIST_URL:
+    state_name = ".jseek-watchlist-state.json"
+else:
+    slug = re.sub(r"[^A-Za-z0-9]+", "-", WATCHLIST_URL).strip("-")
+    state_name = f".jseek-watchlist-state-{slug}.json"
+STATE_FILE = pathlib.Path(__file__).with_name(state_name)
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
 

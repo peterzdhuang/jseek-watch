@@ -10,3 +10,13 @@ Polls a public [jseek.co](https://jseek.co) watchlist every 5 minutes via GitHub
 4. Test: **Actions → watch-jseek → Run workflow**, then send a test push: `curl -d "test" https://ntfy.sh/<topic>`.
 
 Optional email alerts: add secrets `ALERT_TO`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (see header of `jseek-watch.py`).
+
+## Watch any watchlist
+
+Set a repo variable (Settings → Secrets and variables → Actions → **Variables**) `WATCHLIST_URL` to any public jseek watchlist URL, e.g.:
+
+```
+https://jseek.co/en/colophongroup/maang
+```
+
+A separate state file is auto-derived per URL, so you can switch watchlists anytime (or run the script locally for multiple lists). Leave the variable unset to keep watching the default list.

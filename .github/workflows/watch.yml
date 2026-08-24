@@ -26,6 +26,8 @@ jobs:
 
       - name: Poll watchlist
         env:
+          WATCHLIST_URL: ${{ vars.WATCHLIST_URL }}
+          STATE_FILE: ${{ vars.STATE_FILE }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
