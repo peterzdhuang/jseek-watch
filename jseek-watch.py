@@ -11,6 +11,9 @@ Email alerts (optional, via env vars):
 
     SMTP_TLS=starttls (default) or ssl for port 465.
     ALERT_FROM overrides the sender (defaults to SMTP_USER).
+
+Run on a schedule (e.g. cron every 15 min):
+    */15 * * * * cd /path/to/dir && /usr/bin/python3 jseek-watch.py >> /tmp/jseek-watch.log 2>&1
 """
 
 import json
@@ -45,13 +48,16 @@ def fetch_postings():
     return postings, total
 
 
-def send_ntfy(title, message):
+def send_ntfy(title, message, click=None):
     topic = os.environ.get("NTFY_TOPIC")
     if not topic:
         return False
     url = topic if topic.startswith("http") else f"https://ntfy.sh/{topic}"
     body = json.dumps({"topic": url.split("/")[-1], "title": title, "message": message}).encode()
-    urllib.request.urlopen(urllib.request.Request(url, data=body, method="POST"), timeout=15)
+    req = urllib.request.Request(url, data=body, method="POST")
+    if click:
+        req.add_header("Click", click)
+    urllib.request.urlopen(req, timeout=15)
     return True
 
 
@@ -85,8 +91,8 @@ def send_email(title, message):
     return True
 
 
-def send_alert(title, message):
-    sent_ntfy = send_ntfy(title, message)
+def send_alert(title, message, click=None):
+    sent_ntfy = send_ntfy(title, message, click)
     sent_mail = send_email(title, message)
     if not sent_ntfy and not sent_mail:
         print(f"[alert] {title}\n{message}")
@@ -104,8 +110,11 @@ def main():
     new = [(url, p) for url, p in now.items() if url not in known]
 
     if new:
-        lines = [f"- {p['title']} @ {p['company']['name']} ({', '.join(p.get('locationNames', []))})" for _, p in new]
-        send_alert(f"{len(new)} new job(s) on jseek watchlist", "\n".join(lines))
+        lines = [
+            f"- {p['title']} @ {p['company']['name']} ({', '.join(p.get('locationNames', []))})\n  {url}"
+            for url, p in new
+        ]
+        send_alert(f"{len(new)} new job(s) on jseek watchlist", "\n".join(lines), click=new[0][0])
         for _, p in new:
             print(f"NEW: {p['title']} — {p['sourceUrl']}")
 

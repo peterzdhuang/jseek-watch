@@ -3,7 +3,13 @@ name: watch-jseek
 on:
   schedule:
     - cron: '*/5 * * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      test_alert:
+        description: 'Send a test notification'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -28,6 +34,18 @@ jobs:
           ALERT_TO: ${{ secrets.ALERT_TO }}
           ALERT_FROM: ${{ secrets.ALERT_FROM }}
         run: python3 jseek-watch.py
+
+      - name: Send test alert
+        if: ${{ inputs.test_alert }}
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          if [ -n "$NTFY_TOPIC" ]; then
+            curl -s -H "Title: jseek test" -H "Click: https://ntfy.sh/$NTFY_TOPIC" \
+              -d "Test alert from GitHub Actions" "https://ntfy.sh/$NTFY_TOPIC"
+          else
+            echo "NTFY_TOPIC secret is not set"
+          fi
 
       - name: Persist state
         run: |
