@@ -31,7 +31,7 @@ import sys
 import urllib.request
 from email.message import EmailMessage
 
-DEFAULT_WATCHLIST_URL = "https://jseek.co/en/ph1425015107/new-watchlist"
+DEFAULT_WATCHLIST_URL = "https://jseek.co/en/watchlists/11667456-4c10-4042-97ab-6dd20c0b4054"
 WATCHLIST_URL = os.environ.get("WATCHLIST_URL") or DEFAULT_WATCHLIST_URL
 
 if os.environ.get("STATE_FILE"):
